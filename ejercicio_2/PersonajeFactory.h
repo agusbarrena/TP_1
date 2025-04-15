@@ -7,12 +7,10 @@
 
 class PersonajeFactory {
     public:
-        static std::shared_ptr<Personaje> crearPersonaje(const std::string& tipo);
-        static std::shared_ptr<Armas> crearArma(const std::string& tipo);
-        static std::shared_ptr<Personaje> PersonajeArmado(const std::string& tipo, const std::string& armaTipo);
+        static std::shared_ptr<Personaje> crearPersonaje(const std::string& tipo, const std::string& subtipo);
+        static std::shared_ptr<Armas> crearArma(const std::string& tipo, const std::string& subtipo);
+        static std::shared_ptr<Personaje> PersonajeArmado(const std::string& tipo, const std::string& subtipoPersonaje, const std::string& armaTipo, const std::string& subtipoArma);
         //uso static porque me permite no tener que instanciar la clase
-        //uso unique_ptr porque cada personaje es duenio de una unica arma, no es que una arma la utilizan todos los personajes a la vez
-
 };
 
 std::string tipoMagoAleatorio();
