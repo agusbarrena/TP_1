@@ -11,7 +11,7 @@ class Personaje {
     virtual int getHP() const = 0;
     virtual void agregarArma(std::shared_ptr<Armas>) = 0;
     virtual void recibirDanio(int danio) = 0;
-    virtual void atacar(Personaje& enemigo) = 0;
+    virtual int atacar(Personaje& enemigo) = 0;
     virtual void mostrarEstado() const = 0;
     virtual std::shared_ptr<Armas> quitarArma() = 0;
     virtual std::shared_ptr<Armas> getArma() const = 0;

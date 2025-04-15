@@ -15,7 +15,7 @@ class Magos : public Personaje{
         virtual int getHP() const override;
         virtual void agregarArma(std::shared_ptr<Armas>) override;
         virtual void recibirDanio(int danio) override;
-        virtual void atacar(Personaje& enemigo) override;
+        virtual int atacar(Personaje& enemigo) override;
         virtual void mostrarEstado() const override;
         virtual int getpoderMagico() const;
         virtual void setpoderMagico(int poder);
@@ -34,12 +34,13 @@ class Magos : public Personaje{
 class Hechicero : public Magos{
     public:
         Hechicero(std::string nombre, std::string tipo, int HP, int poderMagico);
-        void invocarFuego(std::shared_ptr<Personaje> enemigo);
+        void invocarFuego();
         void leermentes();
-        void atacar(Personaje& enemigo) override;
+        int atacar(Personaje& enemigo) override;
         void recibirDanio(int danio) override;
     private:
     bool leyendoMentes = false;
+    bool invocaFuego = false;
 };
 
 class Conjurador : public Magos{
@@ -47,7 +48,7 @@ class Conjurador : public Magos{
     Conjurador(std::string nombre, std::string tipo, int HP, int poderMagico);
     void conjuraEspectrosNegros();
     void conjuraPrisionMagica();
-    void atacar(Personaje& enemigo) override;
+    int atacar(Personaje& enemigo) override;
     void recibirDanio(int danio) override;
 
     private:
@@ -60,7 +61,7 @@ class Brujo : public Magos{
         Brujo(std::string nombre, std::string tipo, int HP, int poderMagico);
         void arrojaMaldiciones();
         void usaMagiaOscura();
-        void atacar(Personaje& enemigo) override;
+        int atacar(Personaje& enemigo) override;
         void recibirDanio(int danio) override;
     
     private:
@@ -73,7 +74,6 @@ class Nigromante : public Magos{
         Nigromante(std::string nombre, std::string tipo, int HP, int poderMagico);
         void ojoSauron();
         void sobreviveSinCuerpo();
-        void atacar(Personaje& enemigo) override;
         void recibirDanio(int danio) override;
 
     private:

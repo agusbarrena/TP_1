@@ -29,17 +29,18 @@ void Guerrero::recibirDanio(int danio) {
     }
 }
 
-void Guerrero::atacar(Personaje& enemigo) {
-    if (!inventarioGuerrero.empty()) {
-        std::cout << nombre << " ataca a " << enemigo.getNombre() << " con " << inventarioGuerrero[0]->getNombre() << "\n";
+int Guerrero::atacar(Personaje& enemigo) {
+    if (!inventarioGuerrero.empty()  && inventarioGuerrero[0]) {
 
         int danio = inventarioGuerrero[0]->getDanio();
         enemigo.recibirDanio(danio);
 
-        inventarioGuerrero[0]->utilizar();  // Usa el arma (reduce durabilidad o carga mágica)
-
+        inventarioGuerrero[0]->utilizar(); //Usa el arma por lo que reduce durabilidad
+        return danio;
     } else {
-        std::cout << nombre << " no tiene armas para atacar.\n";
+        int danio = 5; // si no tiene arma, hace un ataque básico menor a 10
+        enemigo.recibirDanio(danio);
+        return danio;
     }
 }
 
@@ -52,6 +53,7 @@ void Guerrero::mostrarEstado() const {
     for (const auto& arma : inventarioGuerrero) {
         std::cout << "- " << arma->getNombre() << "\n";
     }
+    std::cout << "------------------------\n";
 }
 
 int Guerrero::getHabilidad() const {
@@ -64,9 +66,9 @@ void Guerrero::setHabilidad(int fuerza) {
 
 std::shared_ptr<Armas> Guerrero::getArma() const {
     if (!inventarioGuerrero.empty()) {
-        return inventarioGuerrero[0]; // Devuelve la primera arma del inventario que es con la que ataca
+        return inventarioGuerrero[0]; // devuelve la primera arma del inventario que es con la que ataca
     }
-    return nullptr; // si no hay armas, devuelve nullptr
+    return nullptr; // si no hay armas devuelve nullptr
 }
 
 std::shared_ptr<Armas> Guerrero::quitarArma() {
@@ -84,45 +86,50 @@ void Barbaro::modoViolento() {
     if(habilidad > 5){
         estaViolento = true;
         habilidad -= 2;
+        std::cout<< nombre << " está muy violento y causará mayor daño a su enemigo.\n";
+    }else{
+        std::cout<< nombre << " no tiene suficiente habilidad para entrar en modo violento.\n" <<std::endl;
     }
-    std::cout<< "No tiene suficiente habilidad para entrar en modo violento.\n" <<std::endl;
 }
 
 void Barbaro::montaBestia() {
     if(habilidad > 5){
         bestia = true;
         habilidad -= 2;
+        std::cout<< nombre << " está montando una bestia y esta recibirá el daño enemigo.\n";
+    }else{
+        std::cout<< nombre << " no tiene suficiente habilidad para montar una bestia.\n" <<std::endl;
     }
-    std::cout<< "No tiene suficiente habilidad para montar una bestia.\n" <<std::endl;
 }
 
-void Barbaro::atacar(Personaje& enemigo) {
-    if (!inventarioGuerrero.empty()) {
+int Barbaro::atacar(Personaje& enemigo) {
+    if (!inventarioGuerrero.empty()  && inventarioGuerrero[0]) {
         int danio = inventarioGuerrero[0]->getDanio();
 
         if (estaViolento) {
             danio *= 2;
             estaViolento = false; //se desactiva el modo violento después de usarlo
-            std::cout << nombre << " ataca en modo violento causando " << danio << " de danio.\n"<< std::endl;
-        } else {
-            std::cout << nombre << " ataca causando " << danio << " de danio.\n"<< std::endl;
-        }
+            std::cout << nombre << " ataca en modo violento causando " << danio << " de daño.\n"<< std::endl;
+        } 
 
         enemigo.recibirDanio(danio);
         inventarioGuerrero[0]->utilizar();
+        return danio;
     } else {
-        std::cout << nombre << " no tiene armas para atacar.\n"<< std::endl;
+        int danio = 5; // si no tiene arma, hace un ataque básico
+        enemigo.recibirDanio(danio);
+        return danio;
     }
 }
 
 void Barbaro::recibirDanio(int danio) {
     if (bestia) {
-        std::cout << nombre << " está montando una bestia. No recibe danio.\n";
+        std::cout << nombre << " está montando una bestia. No recibe daño.\n";
         bestia = false;//se desactiva luego de ser usada
     } else {
         HP -= danio;
         if (HP < 0) HP = 0;
-        std::cout << nombre << " recibe " << danio << " de danio. HP restante: " << HP << "\n";
+        std::cout << nombre << " recibe " << danio << " de daño. HP restante: " << HP << "\n";
     }
 }
 
@@ -131,31 +138,35 @@ Paladin::Paladin(std::string nombre, std::string tipo, int HP, int habilidad) : 
 void Paladin::habilidadesDeSanacion(){
     if(habilidad > 5){
         modoSanador = true;
+        std::cout << nombre << " activa sus habilidades de sanación y es capaz de curarse.\n";
         habilidad -= 2;
-    }  
-    std::cout<< "No tiene suficiente habilidad para usar habilidades de sanacion.\n" <<std::endl;
+    }else{
+        std::cout<< nombre << " no tiene suficiente habilidad para usar habilidades de sanacion.\n" <<std::endl;
+    }
 }
 
 void Paladin::escudoSagrado(){
     if(habilidad > 5){
         escudo = true;
         habilidad -= 2;
-    }  
-    std::cout<< "No tiene suficiente habilidad para usar el escudo sagrado.\n" <<std::endl;
+        std::cout << nombre << " activa su escudo sagrado que le brinda protección.\n";
+    }else{
+        std::cout<< nombre <<" no tiene suficiente habilidad para usar el escudo sagrado.\n" <<std::endl;
+    }
 }
 
 void Paladin::recibirDanio(int danio) {
     if (escudo) {
-        std::cout << nombre << "esta utilizando el escudo sagrado. No recibe danio.\n"<< std::endl;
+        std::cout << nombre << " esta utilizando el escudo sagrado. No recibe daño.\n"<< std::endl;
         escudo = false; //se desactiva luego de ser usada
     }else if(modoSanador){
-        std::cout << nombre << "esta utilizando habilidades de sanacion. No recibe danio.\n"<< std::endl;
+        std::cout << nombre << " esta utilizando habilidades de sanacion. Se cura del daño que recibe.\n"<< std::endl;
         modoSanador = false; //se desactiva luego de ser usada
     }
     else {
         HP -= danio;
         if (HP < 0) HP = 0;
-        std::cout << nombre << " recibe " << danio << " de danio. HP restante: " << HP << "\n";
+        std::cout << nombre << " recibe " << danio << " de daño. HP restante: " << HP << "\n";
     }
 }
 
@@ -165,42 +176,51 @@ void Caballero::usoDeArmadura(){
     if (habilidad > 5) {
         armadura = true;
         habilidad -= 2;
+        std::cout << nombre << " está utilizando su armadura que lo protege.\n";
     } else {
         std::cout << nombre << " no tiene suficiente habilidad para usar armadura.\n";
     }
 }
 
-void Caballero::afinidadConEspada(int danio){
-    danio *= 2;
-    std::cout << nombre << " ataca con su espada causando " << danio << " de danio.\n"<<std::endl;
+void Caballero::afinidadConEspada(){
+    if(habilidad >5){
+        afinidad = true;
+        habilidad -= 2;
+        std::cout << nombre << " este caballero tiene una gran habilidad con su espada y causa mayor daño.\n";
+    }else{
+        std::cout<< nombre <<" no tiene suficiente habilidad para utilizar bien su espada o no tiene espada para utilizar\n" <<std::endl;
+    }
+
 }
 
-void Caballero::atacar(Personaje& enemigo){
-    if(!inventarioGuerrero.empty()){
+int Caballero::atacar(Personaje& enemigo){
+    if(!inventarioGuerrero.empty()  && inventarioGuerrero[0]){
         int danio = inventarioGuerrero[0]->getDanio();
 
-        if(inventarioGuerrero[0]->getNombre() == "Espada"){
+        if((inventarioGuerrero[0]->getNombre() == "Espada") && afinidad){
             danio *= 2;
-            std::cout<< "ataca con espada causando"<< danio << "de danio.\n" <<std::endl;
-        }else{
-            std::cout << nombre << " ataca causando " << danio << " de danio.\n"<< std::endl;
+            std::cout<< nombre <<" ataca teniendo afinidad con su espada aumentando el daño.\n"<<std::endl;
+            afinidad = false;
         }
-
+           
         enemigo.recibirDanio(danio);
         inventarioGuerrero[0]->utilizar();
+        return danio;
     }else{
-        std::cout<<"No tiene armas para atacar"<<std::endl;
+        int danio = 5; // si no tiene arma, hace un ataque básico
+        enemigo.recibirDanio(danio);
+        return danio;
     }
 }
 
 void Caballero::recibirDanio(int danio){
     if (armadura) {
-        std::cout << nombre << " esta usando una armadura. No recibe danio.\n";
+        std::cout << nombre << " esta usando una armadura. No recibe daño.\n";
         armadura = false;//se desactiva luego de ser usada
     } else {
         HP -= danio;
         if (HP < 0) HP = 0;
-        std::cout << nombre << " recibe " << danio << " de danio. HP restante: " << HP << "\n";
+        std::cout << nombre << " recibe " << danio << " de daño. HP restante: " << HP << "\n";
     }
 }
 
@@ -223,28 +243,29 @@ void Mercenario::conocePuntoDebil(){
         conoce = true;
         habilidad-= 2;
     }else{
-        std::cout<< "No tiene la habilidad suficiente para identificar punto debil.\n" <<std::endl;
+        std::cout<< nombre << " no tiene la habilidad suficiente para identificar punto debil.\n" <<std::endl;
     }
 }
 
-void Mercenario::atacar(Personaje& enemigo) {
+int Mercenario::atacar(Personaje& enemigo) {
 
     robarArmaEnemigo(enemigo); //intenta robar el arma
 
-    if (!inventarioGuerrero.empty()) {
+    if (!inventarioGuerrero.empty()  && inventarioGuerrero[0]) {
         int danio = inventarioGuerrero[0]->getDanio();
         if (conoce) {
             danio *= 2;
             conoce = false;
             std::cout << nombre << " conoce el punto débil de " << enemigo.getNombre() << ".\n";
         }
-
-        std::cout << nombre << " ataca causando " << danio << " de danio.\n";
         enemigo.recibirDanio(danio);
         inventarioGuerrero[0]->utilizar();
+        return danio;
         
     } else {
-        std::cout << nombre << " no tiene armas para atacar.\n";
+        int danio = 5; // si no tiene arma, hace un ataque básico
+        enemigo.recibirDanio(danio);
+        return danio;
     }
 }
 

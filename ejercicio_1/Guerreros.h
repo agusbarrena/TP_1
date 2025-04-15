@@ -14,7 +14,7 @@ class Guerrero : public Personaje{
         virtual int getHP() const override;
         virtual void agregarArma(std::shared_ptr<Armas>) override;
         virtual void recibirDanio(int danio) override;
-        virtual void atacar(Personaje& enemigo) override;
+        virtual int atacar(Personaje& enemigo) override;
         virtual void mostrarEstado() const override;
         virtual int getHabilidad() const;
         virtual void setHabilidad(int fuerza);
@@ -35,7 +35,7 @@ class Barbaro : public Guerrero{
         Barbaro(std::string nombre, std::string tipo, int HP, int habilidad);
         void modoViolento();
         void montaBestia();
-        void atacar(Personaje& enemigo) override;
+        int atacar(Personaje& enemigo) override;
         void recibirDanio(int danio) override;
 
     private:
@@ -58,13 +58,14 @@ class Paladin : public Guerrero{
 class Caballero : public Guerrero{
     public:
     Caballero(std::string nombre, std::string tipo, int HP, int habilidad);
-    void afinidadConEspada(int danio);
+    void afinidadConEspada();
     void usoDeArmadura();
-    void atacar(Personaje& enemigo) override;
+    int atacar(Personaje& enemigo) override;
     void recibirDanio(int danio) override;
 
     private:
     bool armadura = false;
+    bool afinidad = false;
 };
 
 class Mercenario : public Guerrero{
@@ -72,7 +73,7 @@ class Mercenario : public Guerrero{
         Mercenario(std::string nombre, std::string tipo, int HP, int habilidad);
         void robarArmaEnemigo(Personaje& enemigo);
         void conocePuntoDebil();
-        void atacar(Personaje& enemigo) override;
+        int atacar(Personaje& enemigo) override;
 
     private:
     bool conoce = false;
