@@ -29,7 +29,7 @@ int main() {
     
     std::string subtipoArma1;
     std::cout << "Ingrese que tipo de " << tipoArma1 <<": ArmaMagica{Baston Magico, Libro de Hechizos, Pocion y Amuleto} o si es  ArmaCombate{Hacha Simple, Hacha Doble, Espada, Lanza o Garrote} o 0 para aleatorio: ";
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');//me permite leer la linea completa para aquellas armas que tienen espacios en el nombre
     std::getline(std::cin, subtipoArma1);
 
     auto jugador1 = PersonajeFactory::PersonajeArmado(tipoJugador1, subtipoJugador1, tipoArma1, subtipoArma1);

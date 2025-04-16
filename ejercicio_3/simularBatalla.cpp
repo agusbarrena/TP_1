@@ -20,22 +20,20 @@ std::string accionToString(Accion accion) {
     }
 }
 
-// Función que determina quién gana la ronda y aplica daño
-void batalla(std::shared_ptr<Personaje>& personaje1, std::shared_ptr<Personaje>& personaje2, Accion accion1, Accion accion2) {
-    // Activar habilidades especiales del personaje1
+
+
+// Función que determina como se desarrolla la batalla con la estructura de un piedra, papel y tijera
+void batalla(std::unique_ptr<Personaje>& personaje1, std::unique_ptr<Personaje>& personaje2, Accion accion1, Accion accion2) {
+    
+    //utilizo los metodos de ataque implementados en el ejercicio_1 
     if (auto barbaro = dynamic_cast<Barbaro*>(personaje1.get())) barbaro->modoViolento();
     if (auto mercenario = dynamic_cast<Mercenario*>(personaje1.get())) mercenario->conocePuntoDebil();
-    if(auto conjurador = dynamic_cast<Conjurador*>(personaje1.get())) conjurador->conjuraEspectrosNegros();
-    if(auto brujo = dynamic_cast<Brujo*>(personaje1.get())) brujo->usaMagiaOscura();
-    
-    // Activar habilidades especiales del personaje2
-    if (auto barbaro = dynamic_cast<Barbaro*>(personaje2.get())) barbaro->montaBestia();
-    if (auto paladin = dynamic_cast<Paladin*>(personaje2.get())) paladin->habilidadesDeSanacion();
-    if (auto caballero = dynamic_cast<Caballero*>(personaje2.get())) caballero->afinidadConEspada();
+    if (auto conjurador = dynamic_cast<Conjurador*>(personaje1.get())) conjurador->conjuraEspectrosNegros();
+    if (auto brujo = dynamic_cast<Brujo*>(personaje1.get())) brujo->usaMagiaOscura();
+    if(auto caballero = dynamic_cast<Caballero*>(personaje2.get())) caballero->afinidadConEspada();
+    if (auto hechicero = dynamic_cast<Hechicero*>(personaje1.get())) hechicero->invocarFuego();
+    if (auto mercenario = dynamic_cast<Mercenario*>(personaje1.get())) mercenario->robarArmaEnemigo(*personaje2);
     if (auto mercenario = dynamic_cast<Mercenario*>(personaje2.get())) mercenario->robarArmaEnemigo(*personaje1);
-    if(auto hechicero = dynamic_cast<Hechicero*>(personaje2.get())) hechicero->invocarFuego();
-    if(auto brujo = dynamic_cast<Brujo*>(personaje2.get())) brujo->arrojaMaldiciones();
-    
 
     std::cout << personaje1->getNombre() << " usa " << accionToString(accion1) << "\n";
     std::cout << personaje2->getNombre() << " usa " << accionToString(accion2) << "\n";
@@ -64,13 +62,22 @@ void batalla(std::shared_ptr<Personaje>& personaje1, std::shared_ptr<Personaje>&
             std::cout << personaje2->getNombre() << " ataca con " << personaje2->getArma()->getNombre() << " y hace " << danio2 << " puntos de daño.\n";
         }
     }
-    
-    if (auto paladin = dynamic_cast<Paladin*>(personaje1.get())) paladin->escudoSagrado();
-    if (auto caballero = dynamic_cast<Caballero*>(personaje1.get())) caballero->usoDeArmadura();
-    if(auto hechicero = dynamic_cast<Hechicero*>(personaje1.get())) hechicero->leermentes();
-    if(auto nigromante = dynamic_cast<Nigromante*>(personaje1.get())) nigromante->ojoSauron();
-    if(auto nigromante = dynamic_cast<Nigromante*>(personaje1.get())) nigromante->sobreviveSinCuerpo();
 
+    //utilizo los metodos de defensa implementados en el ejercicio_1
+    if (auto paladin = dynamic_cast<Paladin*>(personaje1.get())){
+        paladin->escudoSagrado();
+        paladin->habilidadesDeSanacion();
+    }
+    if (auto caballero = dynamic_cast<Caballero*>(personaje1.get())) caballero->usoDeArmadura();
+    if (auto hechicero = dynamic_cast<Hechicero*>(personaje2.get())) hechicero->leermentes();
+    if (auto nigromante = dynamic_cast<Nigromante*>(personaje1.get())) {
+        nigromante->ojoSauron();
+        nigromante->sobreviveSinCuerpo();
+    }
+    if (auto barbaro = dynamic_cast<Barbaro*>(personaje2.get())) barbaro->montaBestia();
+    if(auto caballero = dynamic_cast<Caballero*>(personaje2.get())) caballero->usoDeArmadura();
+    if (auto conjurador = dynamic_cast<Conjurador*>(personaje2.get())) conjurador->conjuraPrisionMagica();
+    if (auto brujo = dynamic_cast<Brujo*>(personaje2.get())) brujo->arrojaMaldiciones();
 }
 
 Accion opcionUsuario() {

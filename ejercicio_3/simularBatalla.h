@@ -13,7 +13,7 @@
 
 enum class Accion { GOLPE_FUERTE = 1, GOLPE_RAPIDO, DEFENSA_Y_GOLPE };
 std::string accionToString(Accion accion);
-void batalla(std::shared_ptr<Personaje>& personaje1, std::shared_ptr<Personaje>& personaje2, Accion accion1, Accion accion2);
+void batalla(std::unique_ptr<Personaje>& personaje1, std::unique_ptr<Personaje>& personaje2, Accion accion1, Accion accion2);
 Accion opcionUsuario();
 Accion opcionMaquina();
 std::string tipoJugadorAleatorio();
