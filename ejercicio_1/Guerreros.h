@@ -12,14 +12,14 @@ class Guerrero : public Personaje{
         virtual std::string getNombre() const override;
         virtual std::string getTipo() const override;
         virtual int getHP() const override;
-        virtual void agregarArma(std::shared_ptr<Armas>) override;
+        virtual void agregarArma(std::unique_ptr<Armas>) override;
         virtual void recibirDanio(int danio) override;
         virtual int atacar(Personaje& enemigo) override;
         virtual void mostrarEstado() const override;
         virtual int getHabilidad() const;
         virtual void setHabilidad(int fuerza);
-        virtual std::shared_ptr<Armas> getArma() const override;
-        virtual std::shared_ptr<Armas> quitarArma() override;
+        virtual const Armas* getArma() const override;
+        virtual std::unique_ptr<Armas> quitarArma() override;
         virtual ~Guerrero() = default;
 
     protected:
@@ -27,7 +27,7 @@ class Guerrero : public Personaje{
     std::string tipo;
     int HP;
     int habilidad;
-    std::vector<std::shared_ptr<Armas>> inventarioGuerrero;
+    std::vector<std::unique_ptr<Armas>> inventarioGuerrero;
 };
 
 class Barbaro : public Guerrero{

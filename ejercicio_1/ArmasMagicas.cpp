@@ -17,12 +17,14 @@ std::string ArmaMagica::getTipo() const{
     return "ArmaMagica";
 }
 
-void ArmaMagica::utilizar(){
+bool ArmaMagica::utilizar(){
     if (cargaMagica > 0){
         cargaMagica -= 1;
         std::cout << nombre << " ha sido utilizada. Carga mágica restante: " << cargaMagica << "\n";
+        return true;
     }else{
         std::cout << nombre << " no tiene carga mágica suficiente para ser utilizada.\n";
+        return false;
     }
 }
 

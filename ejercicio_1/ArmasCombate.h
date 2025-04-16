@@ -11,7 +11,7 @@ class ArmaCombate : public Armas {
     virtual std::string getNombre() const override;
     virtual int getDanio() const override;
     virtual std::string getTipo() const override;
-    virtual void utilizar() override;
+    virtual bool utilizar() override;
     virtual void setDurabilidad(int cantidad);
     virtual int getDurabilidad() const;
     virtual ~ArmaCombate() = default;

@@ -17,12 +17,14 @@ std::string ArmaCombate::getTipo() const{
     return "ArmaCombate";
 }
 
-void ArmaCombate::utilizar() {
+bool ArmaCombate::utilizar() {
     if (durabilidad > 0){
         durabilidad -= 1;
         std::cout << nombre << " ha sido utilizada. Durabilidad restante: " << durabilidad << "\n";
+        return true;
     }else{
         std::cout << nombre << " no tiene durabilidad suficiente para ser utilizada.\n";
+        return false;
     }
 }
 

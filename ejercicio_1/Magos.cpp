@@ -19,8 +19,8 @@ int Magos::getHP() const {
     return HP;
 }
 
-void Magos::agregarArma(std::shared_ptr<Armas> arma) {
-    inventarioMago.push_back(arma);
+void Magos::agregarArma(std::unique_ptr<Armas> arma) {
+    inventarioMago.push_back(std::move(arma));
 }
 
 void Magos::recibirDanio(int danio) {
@@ -34,13 +34,17 @@ void Magos::recibirDanio(int danio) {
 int Magos::atacar(Personaje& enemigo){
     if (!inventarioMago.empty() && inventarioMago[0]) {
 
-        int danio = inventarioMago[0]->getDanio();
-        enemigo.recibirDanio(danio);
-
-        inventarioMago[0]->utilizar();//Usa el arma por lo que reduce durabilidad
-        return danio; 
+        if(inventarioMago[0]->utilizar()){
+            int danio = inventarioMago[0]->getDanio();
+            enemigo.recibirDanio(danio);
+            return danio;
+        }else{
+            inventarioMago.erase(inventarioMago.begin());  //saca el arma del inventario
+            return atacar(enemigo);//vuelve a atacar con el siguiente arma en inventario
+        }
+        
     } else {
-        int danio = 5; // si no tiene arma, hace un ataque básico menor a 10
+        int danio = 10; // si no tiene arma hace un ataque igual a 10 tb
         enemigo.recibirDanio(danio);
         return danio;
     }
@@ -67,16 +71,16 @@ void Magos::setpoderMagico(int poder) {
     poderMagico = poder;
 }
 
-std::shared_ptr<Armas> Magos::getArma() const {
+const Armas* Magos::getArma() const {
     if (!inventarioMago.empty()) {
-        return inventarioMago[0]; //devuelve primer arma del inventario que es con la que se ataca
+        return inventarioMago[0].get(); //devuelve primer arma del inventario que es con la que se ataca
     }
     return nullptr; // si no hay armas devuelve nullptr
 }
 
-std::shared_ptr<Armas> Magos::quitarArma() {
+std::unique_ptr<Armas> Magos::quitarArma() {
     if (!inventarioMago.empty()) {
-        auto armaRobada = inventarioMago[0];
+        auto armaRobada = std::move(inventarioMago[0]);
         inventarioMago.erase(inventarioMago.begin());
         return armaRobada;
     }
@@ -86,19 +90,21 @@ std::shared_ptr<Armas> Magos::quitarArma() {
 Hechicero::Hechicero(std::string nombre, std::string tipo, int HP, int poderMagico) : Magos(nombre, tipo, HP, poderMagico) {}
 
 void Hechicero::invocarFuego(){
-    if(poderMagico > 5){
+    if(poderMagico > 5  && inventarioMago[0]){
         invocaFuego = true;
         poderMagico -= 2; //reduce el poder del hechicero en este caso, pero siempre que usen su poder para las capacidades especiales se les reducira su poder
         std::cout<< nombre << " invoca al Fuego y es capaz de quemar a su enemigo.\n";
-    } else {
+    } else if(poderMagico <= 5) {
         std::cout << nombre << " no tiene suficiente poder mágico para invocar fuego.\n";
+    }else{
+        std::cout << nombre << " no tiene arma para utilizar su capacidad de ataque especial.\n";
     }
 }
 
 void Hechicero::leermentes(){
     if(poderMagico > 5){
         leyendoMentes = true;
-        std::cout << nombre << " está leyendo mentes y es capaz de anticipar el ataque enemigo.\n";
+        std::cout << nombre << " está leyendo mentes y es capaz de anticipar el ataque enemigo en proximas jugadas.\n";
         poderMagico -= 2;
     }
     else {
@@ -108,7 +114,7 @@ void Hechicero::leermentes(){
 
 void Hechicero::recibirDanio(int danio) {
     if (leyendoMentes) {
-        std::cout << nombre << " anticipa el ataque gracias a su poder mental. Daño reducido.\n";
+        std::cout << nombre << " anticipa el ataque gracias a su poder mental que activo anteriormente. Daño reducido.\n";
         danio /= 2;
         leyendoMentes = false;
     }
@@ -119,35 +125,42 @@ void Hechicero::recibirDanio(int danio) {
     std::cout << nombre << " recibe " << danio << " de daño. HP restante: " << HP << "\n";
 }
 
-int Hechicero::atacar(Personaje& enemigo){
+int Hechicero::atacar(Personaje& enemigo) {
     if (!inventarioMago.empty() && inventarioMago[0]) {
-        int danio = inventarioMago[0]->getDanio();
+        if (inventarioMago[0]->utilizar()) {
+            int danio = inventarioMago[0]->getDanio();
 
-        if (invocaFuego) {
-            danio *= 2;
-            invocaFuego= false; //se desactiva la capacidad especial luego de usarla
-            std::cout << nombre << " ataca causando más daño debido al fuego. Causa " << danio << " de daño.\n";
+            if (invocaFuego) {
+                danio *= 2;
+                invocaFuego = false;
+                std::cout << nombre << " ataca causando más daño debido al fuego. Causa " << danio << " de daño.\n";
+            }
+
+            enemigo.recibirDanio(danio);
+            return danio;
+        } else {
+            inventarioMago.erase(inventarioMago.begin());
+            return atacar(enemigo);//vuelve a atacar con el siguiente arma en inventario
         }
-
-        enemigo.recibirDanio(danio);
-        inventarioMago[0]->utilizar();
-        return danio; 
-    } else {
-        int danio = 5; // si no tiene arma, hace un ataque básico menor a 10
+    }else{
+        int danio = 10;
         enemigo.recibirDanio(danio);
         return danio;
     }
 }
 
+
 Conjurador::Conjurador(std::string nombre, std::string tipo, int HP, int poderMagico) : Magos(nombre, tipo, HP, poderMagico) {}
 
 void Conjurador::conjuraEspectrosNegros() {
-    if (poderMagico > 5) {
+    if (poderMagico > 5  && inventarioMago[0]) {
         poderMagico -= 2;
         espectrosNegrosInvocados = true;
         std::cout << nombre << " conjura espectros negros y es capaz de causar mayor daño.\n";
-    } else {
+    } else if(poderMagico <= 5){
         std::cout << nombre << " no tiene suficiente poder mágico para conjurar espectros negros.\n";
+    }else{
+        std::cout << nombre << " no tiene arma para utilizar su capacidad de ataque especial.\n";
     }
 }
 
@@ -163,27 +176,32 @@ void Conjurador::conjuraPrisionMagica() {
 
 int Conjurador::atacar(Personaje& enemigo) {
     if (!inventarioMago.empty() && inventarioMago[0]) {
-        int danio = inventarioMago[0]->getDanio();
-
-        if (espectrosNegrosInvocados) {
-            danio *= 2;
-            espectrosNegrosInvocados = false;
-            std::cout << nombre << " ataca en companía de los Espectros Negros causando " << danio << " de daño.\n";
+        if (inventarioMago[0]->utilizar()) {
+            int danio = inventarioMago[0]->getDanio();
+    
+            if (espectrosNegrosInvocados) {
+                danio *= 2;
+                espectrosNegrosInvocados = false;
+                std::cout << nombre << " ataca en companía de los Espectros Negros causando " << danio << " de daño.\n";
+            }
+    
+            enemigo.recibirDanio(danio);
+            return danio;
+        } else {
+            inventarioMago.erase(inventarioMago.begin());
+            return atacar(enemigo);//vuelve a atacar con el siguiente arma en inventario
         }
-
-        enemigo.recibirDanio(danio);
-        inventarioMago[0]->utilizar();
-        return danio;
-    } else {
-        int danio = 5; 
+    }else{
+        int danio = 10;
         enemigo.recibirDanio(danio);
         return danio;
     }
 }
 
+
 void Conjurador::recibirDanio(int danio){
     if (prisionMagicaActivada) {
-        std::cout << nombre << " está protegido por una prisión magica. No recibe daño.\n";
+        std::cout << nombre << " está protegido por una prisión magica conjurada anteriormente. No recibe daño.\n";
         prisionMagicaActivada = false; 
     } else {
         HP -= danio;
@@ -198,37 +216,43 @@ void Brujo::arrojaMaldiciones() {
     if (poderMagico > 5) {
         maldicionArrojada = true;
         poderMagico -= 2;
-        std::cout << nombre << " arroja una maldición haciendo que el ataque de su enemigo sea debilitado.\n";
+        std::cout << nombre << " arroja una maldición haciendo que el ataque de su enemigo sea debilitado en la proxima jugada.\n";
     } else {
         std::cout << nombre << " no tiene suficiente poder magico para maldecir.\n";
     }
 }
 
 void Brujo::usaMagiaOscura() {
-    if (poderMagico > 5) {
+    if (poderMagico > 5  && inventarioMago[0]) {
         magiaOscuraUsada = true;
         poderMagico -= 2;
         std::cout << nombre << " canaliza magia oscura, hará trizas a su enemigo.\n";
-    } else {
+    } else if(poderMagico <= 5) {
         std::cout << nombre << " no tiene suficiente poder magico para usar magia oscura.\n";
+    }else{
+        std::cout << nombre << " no tiene arma para utilizar su capacidad de ataque especial.\n";
     }
 }
 
 int Brujo::atacar(Personaje& enemigo) {
-    if (!inventarioMago.empty()  && inventarioMago[0]) {
-        int danio = inventarioMago[0]->getDanio();
-
-        if (magiaOscuraUsada) {
-            danio *= 2;
-            magiaOscuraUsada = false;
-            std::cout << nombre << " desata un ataque de magia oscura causando " << danio << " de daño.\n";
+    if (!inventarioMago.empty() && inventarioMago[0]) {
+        if (inventarioMago[0]->utilizar()) {
+            int danio = inventarioMago[0]->getDanio();
+    
+            if (magiaOscuraUsada) {
+                danio *= 2;
+                magiaOscuraUsada = false;
+                std::cout << nombre << " desata un ataque de magia oscura causando " << danio << " de daño.\n";
+            }
+    
+            enemigo.recibirDanio(danio);
+            return danio;
+        } else {
+            inventarioMago.erase(inventarioMago.begin());
+            return atacar(enemigo);//vuelve a atacar con el siguiente arma en inventario
         }
-
-        enemigo.recibirDanio(danio);
-        inventarioMago[0]->utilizar();
-        return danio;
-    } else {
-        int danio = 5; 
+    }else{
+        int danio = 10;
         enemigo.recibirDanio(danio);
         return danio;
     }
@@ -254,9 +278,9 @@ void Nigromante::ojoSauron() {
     if (poderMagico > 5) {
         ojoSauronActivado = true;
         poderMagico -= 2;
-        std::cout << nombre << " activa el Ojo de Sauron, capaz de detectar el ataque de su enemigo y anularlo.\n";
+        std::cout << nombre << " activa el Ojo de Sauron, capaz de detectar el ataque de su enemigo y anularlo en proxima jugada.\n";
     } else {
-        std::cout << nombre << " no tiene suficiente poder magico para invocar el Ojo de Sauron.\n";
+        std::cout << nombre << " no tiene suficiente poder magico para invocar el Ojo de Sauron para su proxima jugada.\n";
     }
 }
 
@@ -269,8 +293,8 @@ void Nigromante::sobreviveSinCuerpo() {
 }
 
 void Nigromante::recibirDanio(int danio) {
-    if (ojoSauronActivado) {
-        std::cout << nombre << " anticipa el ataque con el Ojo de Sauron, no recibe daño.\n";
+    if (ojoSauronActivado && (poderMagico > 5)) {
+        std::cout << nombre << " anticipa el ataque con el Ojo de Sauron que tenia activado, no recibe daño.\n";
         ojoSauronActivado = false; 
         return;
     }

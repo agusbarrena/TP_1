@@ -8,7 +8,7 @@ public:
     virtual std::string getNombre() const override;
     virtual int getDanio() const override;
     virtual std::string getTipo() const override;
-    virtual void utilizar() override;
+    virtual bool utilizar() override;
     virtual void cargarMagia(int cantidad);
     virtual int getCargaMagica() const;
     virtual ~ArmaMagica() = default;

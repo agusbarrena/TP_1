@@ -13,14 +13,14 @@ class Magos : public Personaje{
         virtual std::string getNombre() const override;
         virtual std::string getTipo() const override;
         virtual int getHP() const override;
-        virtual void agregarArma(std::shared_ptr<Armas>) override;
+        virtual void agregarArma(std::unique_ptr<Armas>) override;
         virtual void recibirDanio(int danio) override;
         virtual int atacar(Personaje& enemigo) override;
         virtual void mostrarEstado() const override;
         virtual int getpoderMagico() const;
         virtual void setpoderMagico(int poder);
-        virtual std::shared_ptr<Armas> getArma() const override;
-        virtual std::shared_ptr<Armas> quitarArma() override;
+        virtual const Armas* getArma() const override;
+        virtual std::unique_ptr<Armas> quitarArma() override;
         virtual ~Magos() = default;
 
     protected:
@@ -28,7 +28,7 @@ class Magos : public Personaje{
     std::string tipo;
     int HP;
     int poderMagico;
-    std::vector<std::shared_ptr<Armas>> inventarioMago;
+    std::vector<std::unique_ptr<Armas>> inventarioMago;
 };
 
 class Hechicero : public Magos{
