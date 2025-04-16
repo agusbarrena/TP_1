@@ -14,19 +14,19 @@ int main(){
 
     std::cout<< "Se van a generar: "<< cant_Magos<< " Magos y "<< cant_Guerreros<< " Guerreros.\n" <<std::endl;
 
-    std::vector<std::shared_ptr<Personaje>> personajes;
+    std::vector<std::unique_ptr<Personaje>> personajes;
 
     for(int i = 0; i < cant_Magos; i++){
         auto mago = PersonajeFactory::PersonajeArmado("Mago", "0","ArmaMagica", "0");
         if(mago){
-            personajes.push_back(mago);
+            personajes.push_back(std::move(mago));
         }
     }
 
     for(int j = 0; j < cant_Guerreros; j++){
         auto guerrero = PersonajeFactory::PersonajeArmado("Guerrero","0", "ArmaCombate", "0");
         if(guerrero){
-            personajes.push_back(guerrero);
+            personajes.push_back(std::move(guerrero));
         }
     }
 

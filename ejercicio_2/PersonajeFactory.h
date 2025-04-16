@@ -7,9 +7,9 @@
 
 class PersonajeFactory {
     public:
-        static std::shared_ptr<Personaje> crearPersonaje(const std::string& tipo, const std::string& subtipo);
-        static std::shared_ptr<Armas> crearArma(const std::string& tipo, const std::string& subtipo);
-        static std::shared_ptr<Personaje> PersonajeArmado(const std::string& tipo, const std::string& subtipoPersonaje, const std::string& armaTipo, const std::string& subtipoArma);
+        static std::unique_ptr<Personaje> crearPersonaje(const std::string& tipo, const std::string& subtipo);
+        static std::unique_ptr<Armas> crearArma(const std::string& tipo, const std::string& subtipo);
+        static std::unique_ptr<Personaje> PersonajeArmado(const std::string& tipo, const std::string& subtipoPersonaje, const std::string& armaTipo, const std::string& subtipoArma);
         //uso static porque me permite no tener que instanciar la clase
 };
 
